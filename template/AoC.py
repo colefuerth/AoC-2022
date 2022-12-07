@@ -20,7 +20,7 @@ if __name__ == "__main__":
     # start by getting file as a list of strings
     fname = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
     f = [
-        l
+        l.strip()
         for l in open(fname, 'r').readlines()
     ]
     print(f)
