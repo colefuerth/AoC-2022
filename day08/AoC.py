@@ -6,11 +6,12 @@ from copy import deepcopy
 import numpy as np
 
 DIRECTIONS = list(map(np.array, [
-    (0, 1), # right
-    (0, -1), # left
-    (1, 0), # down
-    (-1, 0), # up
+    (0, 1),  # right
+    (0, -1),  # left
+    (1, 0),  # down
+    (-1, 0),  # up
 ]))
+
 
 def traverse(coord, direction) -> tuple:
     coord = np.array(coord)
@@ -21,9 +22,11 @@ def traverse(coord, direction) -> tuple:
 
 
 def part1(trees: np.ndarray) -> int:
-    coords = set(map(tuple, product(range(trees.shape[0]), range(trees.shape[1]))))
+    coords = set(
+        map(tuple, product(range(trees.shape[0]), range(trees.shape[1]))))
     vis = np.zeros(f.shape)
-    def visible(coord:tuple) -> bool:
+
+    def visible(coord: tuple) -> bool:
         height = trees[coord]
         for direction in DIRECTIONS:
             for new_coord in traverse(coord, direction):
@@ -36,11 +39,13 @@ def part1(trees: np.ndarray) -> int:
         vis[coord] = visible(coord)
     return int(vis.sum())
 
+
 def part2(trees: np.ndarray) -> int:
-    coords = set(map(tuple, product(range(trees.shape[0]), range(trees.shape[1]))))
+    coords = set(
+        map(tuple, product(range(trees.shape[0]), range(trees.shape[1]))))
     vis = np.zeros(f.shape)
 
-    def scenic(coord:np.ndarray) -> int:
+    def scenic(coord: np.ndarray) -> int:
         height = trees[coord]
         visible_by_direction = np.zeros(len(DIRECTIONS))
         for i, direction in enumerate(DIRECTIONS):
