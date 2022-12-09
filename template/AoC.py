@@ -4,8 +4,7 @@ import sys
 from itertools import product, count, permutations
 from copy import deepcopy
 import re
-
-# AoC template for python3
+import numpy as np
 
 
 def part1(f: list) -> int:
