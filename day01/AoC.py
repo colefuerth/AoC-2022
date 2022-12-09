@@ -19,7 +19,8 @@ def part2(f:list) -> int:
 
 if __name__ == "__main__":
     # start by getting file as a list of strings
-    f = [l for l in open(sys.argv[1], 'r')]
+    inp = sys.argv[1] if len(sys.argv) > 1 else 'input.txt'
+    f = [l for l in open(inp, 'r')]
 
     print("Part 1:", part1(deepcopy(f)))
     print("Part 2:", part2(deepcopy(f)))
