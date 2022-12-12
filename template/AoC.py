@@ -7,6 +7,7 @@ import re
 import numpy as np
 from collections import defaultdict, Counter
 import progressbar as pb
+from termcolor import colored
 
 
 def part1(f: list) -> int:
