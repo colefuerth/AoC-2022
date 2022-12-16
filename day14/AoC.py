@@ -47,8 +47,6 @@ def pointsOnLine(p1, p2) -> list:
         res = [(x1, y) for y in range(min(y1, y2), max(y1, y2)+1)]
     elif dy == 0:
         res = [(x, y1) for x in range(min(x1, x2), max(x1, x2)+1)]
-    # print(f'Line: {p1} -> {p2}')
-    # print(f'Points on line: {res}')
     return res
 
 
@@ -64,7 +62,7 @@ def print_rocks(rocks: dict):
 
 
 def part1(f: list) -> int:
-    rocks = {(500, 0): '+'}
+    rocks = {}
     for group in f:
         for line in zip(group[:-1], group[1:]):
             rocks.update({p: '#' for p in pointsOnLine(*line)})
@@ -88,58 +86,37 @@ def part1(f: list) -> int:
 
 
 def part2(f: list) -> int:
-    rocks = {(500, 0): '+'}
+    rocks = {}
     for group in f:
         for line in zip(group[:-1], group[1:]):
             rocks.update({p: '#' for p in pointsOnLine(*line)})
-    minpos = 10
+    minpos = max(rocks.keys(), key=lambda x: x[1])[1] + 1
 
     def simulate() -> bool:
         grain = Sand(SAND)
         if grain + (0, 1) not in rocks:
-            new_y = min([r[1] for r in rocks.keys() if r[0] == grain[0]] + [minpos + 1])
+            new_y = min([r[1]
+                        for r in rocks.keys() if r[0] == grain[0]] + [minpos])
             grain = Sand((grain[0], new_y - 1))
         while True:
             lastpos = grain
             for d in DIR_ORDER:
                 newgrain = grain + d
-                if newgrain[1] == 10 or newgrain not in rocks:
+                if newgrain[1] <= minpos and newgrain not in rocks:
                     grain = newgrain
                     break
             if grain == lastpos:
                 rocks[grain] = 'o'
                 return True
         return False
-    # garbage collection can remove sand if the next two spots above that grain are occupied
-    def gc():
-        print('Garbage collection')
-        deleting = [
-            k for k, v in rocks.items()
-            if v == 's' and (k[0], k[1] - 3) in rocks and (k[0], k[1] - 2) in rocks and (k[0], k[1] - 1) in rocks
-        ]
-        d = len(deleting)
-        for k in deleting:
-            del rocks[k]
-        del deleting
-        print('Deleted:', d)
-        return d
 
-    c = count()
-    deleted = 0
-    minx, maxx = min(rocks.keys(), key=lambda x: x[0])[0], max(rocks.keys(), key=lambda x: x[0])[0]
-    while (minx - 1, 10) not in rocks and (maxx, 10) not in rocks:
+    while (500, 0) not in rocks:
         simulate()
-        # # gc()
-        # if next(c) % 100 == 0:
-        print('Iteration:', next(c))
-        deleted += gc()
-        # print_rocks(rocks)
-    
-    return sum(1 for v in rocks.values() if v == 'o') + deleted
+
+    return sum(1 for v in rocks.values() if v == 'o')
 
 
 if __name__ == '__main__':
-    # fname = sys.argv[1] if len(sys.argv) > 1 else 'input.txt'
     r = re.compile(r'\d+,\d+')
     f = [[
         [int(x) for x in rock.split(',')]
