@@ -46,6 +46,16 @@ def calcDistances(valve: Valve, valves: dict) -> dict:
                 queue.append((valves[d], dist+1))
     return valve.dist
 
+bestPathCache = dict()
+def bestPath(valve: Valve, valves:dict, closed: set, minutes_left: int) -> tuple:
+    # find the best path from valve to a closed valve
+    # return the valve, the pressure, and the minutes left
+    # use a DFS
+    if (valve, closed, minutes_left) in bestPathCache:
+        return bestPathCache[(valve, closed, minutes_left)]
+    
+    bestPathCache[(valve, closed, minutes_left)] = best_valve, best_pressure, best_minutes_left
+    return best_valve, best_pressure, best_minutes_left
 
 def part1(valves: dict) -> int:
     # treat f as a stack, if pos not at the best valve, pop and try again
@@ -61,13 +71,7 @@ def part1(valves: dict) -> int:
             if pos.dist[v] < minutes_left}
         if not valve_values:
             break
-        best_valve = max(valve_values, key=valve_values.get)
-        print(f'pos is {pos.name}, moving to {best_valve.name} in {pos.dist[best_valve]} minutes')
-        print(f'opening valve {best_valve.name} at minute {30-minutes_left+pos.dist[best_valve]}')
-        minutes_left -= pos.dist[best_valve] + 1
-        pressure += valve_values[best_valve]
-        closed.remove(best_valve)
-        pos = best_valve
+        valve_values = sorted(valve_values.items(), key=lambda x: x[1], reverse=True)
     return pressure
 
 
