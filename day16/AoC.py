@@ -46,6 +46,7 @@ def calcDistances(valve: Valve, valves: dict) -> dict:
                 queue.append((valves[d], dist+1))
     return valve.dist
 
+
 bestPathCache = dict()
 def bestPath(valve: Valve, valves:dict, closed: set, minutes_left: int) -> tuple:
     # find the best path from valve to a closed valve
