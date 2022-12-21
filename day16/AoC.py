@@ -46,17 +46,44 @@ def calcDistances(valve: Valve, valves: dict) -> dict:
                 queue.append((valves[d], dist+1))
     return valve.dist
 
-
+def hashset(s: set) -> int:
+    return sum(hash(v) for v in s)
 bestPathCache = dict()
 def bestPath(valve: Valve, valves:dict, closed: set, minutes_left: int) -> tuple:
     # find the best path from valve to a closed valve
     # return the valve, the pressure, and the minutes left
     # use a DFS
-    if (valve, closed, minutes_left) in bestPathCache:
-        return bestPathCache[(valve, closed, minutes_left)]
+    if (valve, hashset(closed), minutes_left) in bestPathCache:
+        return bestPathCache[(valve, hashset(closed), minutes_left)]
     
-    bestPathCache[(valve, closed, minutes_left)] = best_valve, best_pressure, best_minutes_left
-    return best_valve, best_pressure, best_minutes_left
+    if not closed:
+        return None, 0
+
+    # create a cache of the next best valve to investigate
+    valve_values = {
+        v: v.rate * (minutes_left - valve.dist[v] - 1)
+        for v in closed
+        if valve.dist[v] < minutes_left}
+    if not valve_values:
+        return None, 0
+    valve_values = sorted(valve_values.items(), key=lambda x: x[1], reverse=True)
+
+    best_valve, best_pressure = None, 0
+    worse_count = 0
+    for v, p in valve_values:
+        closed.remove(v)
+        vp, pp = bestPath(v, valves, closed, minutes_left - valve.dist[v] - 1)
+        closed.add(v)
+        if pp > best_pressure:
+            best_valve, best_pressure = vp, pp
+        else:
+            worse_count += 1
+        if worse_count > 10:
+            break
+    best_pressure += p
+
+    bestPathCache[(valve, hashset(closed), minutes_left)] = best_valve, best_pressure
+    return best_valve, best_pressure
 
 def part1(valves: dict) -> int:
     # treat f as a stack, if pos not at the best valve, pop and try again
@@ -65,15 +92,8 @@ def part1(valves: dict) -> int:
 
     closed = set(valves.values())
     minutes_left = 30
-    while minutes_left > 0:
-        valve_values = {
-            v: v.rate * (minutes_left - pos.dist[v] - 1)
-            for v in closed
-            if pos.dist[v] < minutes_left}
-        if not valve_values:
-            break
-        valve_values = sorted(valve_values.items(), key=lambda x: x[1], reverse=True)
-    return pressure
+    best_valve, best_pressure = bestPath(pos, valves, closed, minutes_left)
+    return best_pressure
 
 
 def part2(f: list) -> int:
