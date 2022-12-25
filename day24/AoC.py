@@ -34,7 +34,7 @@ def simulate(walls: set, snowflake: list, size: tuple) -> None:
                 pos[0] -= size[0] - 2
 
 
-def print_mountain(elves:set, snowflake:list, walls:set, size:tuple):
+def print_mountain(elves: set, snowflake: list, walls: set, size: tuple):
     sf2 = [tuple(p) for p, _ in snowflake]
     for i in range(size[0]):
         for j in range(size[1]):
@@ -56,7 +56,6 @@ def print_mountain(elves:set, snowflake:list, walls:set, size:tuple):
 def part1(f: list) -> int:
     walls, snowflake, start, end, size = f
     queue = set([start])
-    print_mountain(queue, snowflake, walls, size)
     c = count()
     for _ in c:
         simulate(walls, snowflake, size)
@@ -66,26 +65,31 @@ def part1(f: list) -> int:
             new_p = add_tup(p, d)
             if new_p in walls or new_p in sfset:
                 continue
-            if new_p == end:
-                return next(c)
             new_queue.add(new_p)
         queue = new_queue
-        print_mountain(queue, snowflake, walls, size)
-
-        # 153 is too low
+        if end in queue:
+            return next(c)
 
 
 def part2(f: list) -> int:
-    pass
+    walls, snowflake, start, end, size = f
+    order = [(start, end), (end, start), (start, end)]
+    return sum(
+        part1([walls, snowflake, s, e, size])
+        for s, e in order
+    )
 
 
 if __name__ == '__main__':
-    fname = sys.argv[1] if len(sys.argv) > 1 else 'input.txt'
+    fname = sys.argv[1] if len(
+        sys.argv) > 1 else '/home/cole/AoC-2022/day24/input.txt'
     f = [l.strip() for l in open(fname, 'r').readlines()]
     start = (0, f[0].index('.'))
     end = (len(f) - 1, f[-1].index('.'))
     snowflake = []
     walls = set()
+    walls.add(add_tup(start, (-1, 0)))
+    walls.add(add_tup(end, (1, 0)))
     for i, l in enumerate(f):
         for j, c in enumerate(l):
             if c in '><^v':
@@ -94,4 +98,4 @@ if __name__ == '__main__':
                 walls.add((i, j))
     size = (len(f), len(f[0]))
     print('Part 1:', part1(deepcopy([walls, snowflake, start, end, size])))
-    print('Part 2:', part2(f))
+    print('Part 2:', part2(deepcopy([walls, snowflake, start, end, size])))
