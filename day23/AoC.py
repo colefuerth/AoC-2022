@@ -6,16 +6,6 @@ from copy import deepcopy
 
 # (x, y) = (row, col)
 
-ADJ = list(product([-1, 0, 1], repeat=2))
-ADJ.remove((0, 0))
-
-DIR = [
-    [(-1, 0), [(-1, 0), (-1, 1), (-1, -1)]],  # N
-    [(1, 0), [(1, 0), (1, 1), (1, -1)]],  # S
-    [(0, -1), [(0, -1), (1, -1), (-1, -1)]],  # W
-    [(0, 1), [(0, 1), (1, 1), (-1, 1)]],  # E
-]
-
 
 def add_tup(a, b) -> tuple:
     return a[0] + b[0], a[1] + b[1]
@@ -36,6 +26,15 @@ def print_elves(elves: set):
 
 
 def part1(elves: set) -> int:
+    ADJ = list(product([-1, 0, 1], repeat=2))
+    ADJ.remove((0, 0))
+
+    DIR = [
+        [(-1, 0), [(-1, 0), (-1, 1), (-1, -1)]],  # N
+        [(1, 0), [(1, 0), (1, 1), (1, -1)]],  # S
+        [(0, -1), [(0, -1), (1, -1), (-1, -1)]],  # W
+        [(0, 1), [(0, 1), (1, 1), (-1, 1)]],  # E
+    ]
 
     for _ in range(10):
         # first half of round, find proposals
@@ -63,6 +62,16 @@ def part1(elves: set) -> int:
 
 
 def part2(elves: set) -> int:
+
+    ADJ = list(product([-1, 0, 1], repeat=2))
+    ADJ.remove((0, 0))
+
+    DIR = [
+        [(-1, 0), [(-1, 0), (-1, 1), (-1, -1)]],  # N
+        [(1, 0), [(1, 0), (1, 1), (1, -1)]],  # S
+        [(0, -1), [(0, -1), (1, -1), (-1, -1)]],  # W
+        [(0, 1), [(0, 1), (1, 1), (-1, 1)]],  # E
+    ]
     c = count()
     for _ in c:
         # first half of round, find proposals
@@ -70,23 +79,17 @@ def part2(elves: set) -> int:
         for elf in elves:
             if any(add_tup(elf, a) in elves for a in ADJ):
                 for d, fan in DIR:
-                    if all(add_tup(elf, df) not in elves for df in fan):
+                    if not any(add_tup(elf, dd) in elves for dd in fan):
                         proposals[elf] = add_tup(elf, d)
                         break
         # second half, apply proposals if no collision
         plist = list(proposals.values())
         proposals = {k: v for k, v in proposals.items() if plist.count(v) == 1}
         if len(proposals) == 0:
-            print(f'After {_ + 1} rounds:')
-            print_elves(elves)
             return next(c)
         for elf, newelf in proposals.items():
             elves.remove(elf)
             elves.add(newelf)
-        # rotate
-        print(f'After {_ + 1} rounds:')
-        print(proposals)
-        print_elves(elves)
         DIR.append(DIR.pop(0))
 
     return next(c)
